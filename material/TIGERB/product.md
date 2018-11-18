@@ -24,7 +24,7 @@ CREATE TABLE `product_category` (
     `name` varchar(255) unsigned NOT NULL DEFAULT '0' COMMENT '分类名称',
     `desc` varchar(255) unsigned NOT NULL DEFAULT '0' COMMENT '分类描述',
     `pic_url` varchar(255) unsigned NOT NULL DEFAULT '0' COMMENT '分类图片',
-    `path` varchar(255) unsigned NOT NULL DEFAULT '0' COMMENT '分类地址',
+    `path` varchar(255) unsigned NOT NULL DEFAULT '0' COMMENT '分类地址{pid}-{child_id}-...',
     `create_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
     `create_by` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建人staff_id',
     `update_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -46,7 +46,6 @@ CREATE TABLE `product_spu` (
     `main_url` text COMMENT '商品介绍主图 多个图片逗号分隔',
     `price` decimal(11,2) unsigned NOT NULL DEFAULT '0' COMMENT '售价',
     `market_price` decimal(11,2) unsigned NOT NULL DEFAULT '0' COMMENT '市场价',
-    `extends` text NOT NULL DEFAULT '0' COMMENT '扩展字段',
     `create_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
     `create_by` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建人staff_id',
     `update_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -65,7 +64,6 @@ CREATE TABLE `product_sku` (
     `main_url` text COMMENT '商品介绍主图 多个图片逗号分隔',
     `price` decimal(11,2) unsigned NOT NULL DEFAULT '0' COMMENT '售价',
     `market_price` decimal(11,2) unsigned NOT NULL DEFAULT '0' COMMENT '市场价',
-    `extends` text NOT NULL DEFAULT '0' COMMENT '扩展字段',
     `create_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
     `create_by` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建人staff_id',
     `update_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -122,6 +120,7 @@ CREATE TABLE `product_sku_stock` (
     `sku_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'sku id',
     `quantity` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '库存',
     `quantity_lock` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '锁定库存',
+    `quantity_over` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '超卖库存 0:严格不准超卖',
     `create_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
     `create_by` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建人staff_id',
     `update_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -131,3 +130,7 @@ CREATE TABLE `product_sku_stock` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='sku库存表';
 
 ```
+
+仓储 --(incre sku quantity)push/pull--> update `product_sku_stock` & incr redis
+
+回写脚本 ----> select `product_sku_stock`.`quantity`  & update
